@@ -1,0 +1,32 @@
+import java.util.Scanner;
+
+public class Ascendente {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int[] array = new int[10];
+        int previousNumber = Integer.MIN_VALUE;
+
+        System.out.println("Ingresa 10 números en orden ascendente:");
+
+        for (int i = 0; i < 10; i++) {
+            int number;
+            while (true) {
+                System.out.print("Número " + (i + 1) + ": ");
+                number = scanner.nextInt();
+
+                if (number > previousNumber) {
+                    array[i] = number;
+                    previousNumber = number;
+                    break;
+                } else {
+                    System.out.println("El número debe ser mayor que el anterior. Inténtalo de nuevo.");
+                }
+            }
+        }
+
+        System.out.println("Números ingresados en el arreglo:");
+        for (int num : array) {
+            System.out.print(num + " ");
+        }
+    }
+}
