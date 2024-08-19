@@ -1,0 +1,36 @@
+import java.util.Scanner;
+
+public class Tiempo {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Pedir al usuario que ingrese las horas, minutos y segundos
+        System.out.print("Ingrese el número de horas: ");
+        int horas = scanner.nextInt();
+
+        System.out.print("Ingrese el número de minutos: ");
+        int minutos = scanner.nextInt();
+
+        System.out.print("Ingrese el número de segundos: ");
+        int segundos = scanner.nextInt();
+
+        // Convertir el tiempo a segundos
+        int totalSegundos = convertirATotalSegundos(horas, minutos, segundos);
+
+        // Imprimir el resultado
+        System.out.println("El equivalente en segundos es: " + totalSegundos);
+        
+        scanner.close(); // Cerrar el scanner
+    }
+
+    // Función que convierte horas, minutos y segundos a segundos
+    public static int convertirATotalSegundos(int horas, int minutos, int segundos) {
+        final int segundosPorHora = 3600; // Número de segundos en una hora
+        final int segundosPorMinuto = 60; // Número de segundos en un minuto
+
+        // Calcular el total de segundos
+        int totalSegundos = (horas * segundosPorHora) + (minutos * segundosPorMinuto) + segundos;
+
+        return totalSegundos;
+    }
+}
