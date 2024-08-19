@@ -1,0 +1,14 @@
+public class suma {
+    public static int sumaArreglo(int[] arreglo) {
+        int suma = 0;
+        for (int i : arreglo) {
+            suma += i;
+        }
+        return suma;
+    }
+
+    public static void main(String[] args) {
+        int[] arreglo = {1, 2, 3, 4, 5};
+        System.out.println(sumaArreglo(arreglo));
+    }
+}
