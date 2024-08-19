@@ -1,0 +1,45 @@
+import java.util.Scanner;
+
+public class Estacionameiento {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Pedir al usuario que ingrese el número de horas
+        System.out.print("Ingrese el número de horas: ");
+        double horas = scanner.nextDouble();
+
+        // Calcular el cargo basado en las horas ingresadas
+        double cargo = calcularCargo(horas);
+
+        // Imprimir el cargo
+        System.out.println("El cargo por " + horas + " horas es: S/" + cargo);
+        
+        scanner.close(); // Cerrar el scanner
+    }
+
+    // Función que calcula el cargo basado en el número de horas
+    public static double calcularCargo(double horas) {
+        final double primeraHora = 3.00; // Cargo por la primera hora
+        final double horasAdicionales = 0.50; // Cargo por cada hora adicional
+        final double maximoDiario = 12.00; // Cargo máximo por día
+
+        if (horas <= 0) {
+            return 0; // Si las horas son 0 o negativas, el cargo es 0
+        }
+
+        double cargo;
+
+        if (horas <= 1) {
+            cargo = primeraHora; // Cargo para 1 hora o menos
+        } else {
+            cargo = primeraHora + (horas - 1) * horasAdicionales; // Cargo por más de 1 hora
+        }
+
+        // Asegurarse de que el cargo no supere el máximo diario
+        if (cargo > maximoDiario) {
+            cargo = maximoDiario;
+        }
+
+        return cargo;
+    }
+}
