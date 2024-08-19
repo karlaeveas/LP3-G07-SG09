@@ -1,0 +1,25 @@
+import java.util.Random;
+
+public class Simulacion {
+    public static void main(String[] args) {
+        final int numRolls = 20000; // Número de lanzamientos
+        final int numFaces = 6;     // Número de caras del dado
+
+        // Arreglo para guardar las frecuencias de cada cara
+        int[] frequencies = new int[numFaces];
+
+        // Crear un objeto Random para generar números aleatorios
+        Random random = new Random();
+
+        // Simular los lanzamientos del dado
+        for (int i = 0; i < numRolls; i++) {
+            int roll = random.nextInt(numFaces); // Lanzamiento del dado (0 a 5)
+            frequencies[roll]++; // Incrementar la frecuencia de la cara correspondiente
+        }
+
+        // Mostrar los resultados
+        for (int i = 0; i < numFaces; i++) {
+            System.out.println("Cara " + (i + 1) + ": " + frequencies[i] + " veces");
+        }
+    }
+}
