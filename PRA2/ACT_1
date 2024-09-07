@@ -1,0 +1,81 @@
+/***********************************************************************************************
+ARCHIVO		: COCHE.JAVA
+FECHA		: 05/09/2024
+DESCRIPCIÓN	: Clase coche con métodos para manipular instancias de autoa, aplicando descuentos.
+***********************************************************************************************/
+package practica2;
+
+public class Coche {
+    // Atributos
+    private String marca;
+    private int añoFabricacion;
+    private double precio;
+
+    // Constructor por defecto
+    public Coche() {
+        this.marca = "";
+        this.añoFabricacion = 0;
+        this.precio = 0.0;
+    }
+
+    // Constructor con parámetros
+    public Coche(String marca, int añoFabricacion, double precio) {
+        this.marca = marca;
+        this.añoFabricacion = añoFabricacion;
+        this.precio = precio;
+    }
+
+    // Setters y Getters
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public int getAñoFabricacion() {
+        return añoFabricacion;
+    }
+
+    public void setAñoFabricacion(int añoFabricacion) {
+        this.añoFabricacion = añoFabricacion;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    // Método para aplicar descuento si es un modelo anterior a 2010
+    public boolean aplicarDescuento() {
+        if (añoFabricacion < 2010) {
+            this.precio *= 0.9; // Aplica un 10% de descuento
+            System.out.println("Descuento aplicado. Nuevo precio: " + this.precio);
+            return true;
+        } else {
+            System.out.println("No se aplicó descuento. Año de fabricación reciente.");
+            return false;
+        }
+    }
+    
+    // Métodos de interacción
+    public void encender() {
+        System.out.println("El coche " + marca + " está encendido.");
+    }
+
+    public void acelerar() {
+        System.out.println("El coche " + marca + " está acelerando.");
+    }
+
+    public void frenar() {
+        System.out.println("El coche " + marca + " está frenando.");
+    }
+
+    public void apagar() {
+        System.out.println("El coche " + marca + " está apagado.");
+    }
+}
