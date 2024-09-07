@@ -1,1 +1,155 @@
-SVFD
+import java.util.ArrayList;
+import java.util.List;
+ 
+abstract class Persona {
+    private String nombre;
+    private String apellido;
+    private String id;
+    
+    public Persona(String nombre, String apellido, String id) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.id = id;
+    }
+    
+    public String getNombre() {
+        return nombre;
+    }
+    
+    public String getApellido() {
+        return apellido;
+    }
+    
+    public String getId() {
+        return id;
+    }
+    
+    public abstract void mostrarInformacion();
+}
+ 
+class Estudiante extends Persona {
+    private List<Curso> cursosInscritos = new ArrayList<>();
+    
+    public Estudiante(String nombre, String apellido, String id) {
+        super(nombre, apellido, id);
+    }
+    
+    public void inscribirCurso(Curso curso) {
+        cursosInscritos.add(curso);
+    }
+    
+    @Override
+    public void mostrarInformacion() {
+        System.out.println("Estudiante: " + getNombre() + " " + getApellido() + " (ID: " + getId() + ")");
+    }
+    
+    public List<Curso> getCursosInscritos() {
+        return cursosInscritos;
+    }
+}
+ 
+class Profesor extends Persona {
+    private List<Curso> cursosAsignados = new ArrayList<>();
+    
+    public Profesor(String nombre, String apellido, String id) {
+        super(nombre, apellido, id);
+    }
+    
+    public void asignarCurso(Curso curso) {
+        cursosAsignados.add(curso);
+    }
+    
+    @Override
+    public void mostrarInformacion() {
+        System.out.println("Profesor: " + getNombre() + " " + getApellido() + " (ID: " + getId() + ")");
+    }
+    
+    public List<Curso> getCursosAsignados() {
+        return cursosAsignados;
+    }
+}
+ 
+class Curso {
+    private String nombre;
+    private static final int MAX_ESTUDIANTES = 30;
+    private Profesor profesor;
+    private List<Estudiante> estudiantesInscritos = new ArrayList<>();
+    
+    public Curso(String nombre, Profesor profesor) {
+        this.nombre = nombre;
+        this.profesor = profesor;
+    }
+    
+    public String getNombre() {
+        return nombre;
+    }
+    
+    public void inscribirEstudiante(Estudiante estudiante) {
+        if (estudiantesInscritos.size() < MAX_ESTUDIANTES) {
+            estudiantesInscritos.add(estudiante);
+            estudiante.inscribirCurso(this);
+        } else {
+            System.out.println("El curso está lleno.");
+        }
+    }
+    
+    public void mostrarInformacion() {
+        System.out.println("Curso: " + nombre);
+        System.out.println("Profesor a cargo: " + profesor.getNombre() + " " + profesor.getApellido());
+        System.out.println("Estudiantes inscritos: " + estudiantesInscritos.size());
+    }
+}
+ 
+class SistemaGestion {
+    private List<Curso> cursosDisponibles = new ArrayList<>();
+    private List<Estudiante> estudiantes = new ArrayList<>();
+    private List<Profesor> profesores = new ArrayList<>();
+    
+    public void agregarCurso(Curso curso) {
+        cursosDisponibles.add(curso);
+    }
+    
+    public void agregarEstudiante(Estudiante estudiante) {
+        estudiantes.add(estudiante);
+    }
+    
+    public void agregarProfesor(Profesor profesor) {
+        profesores.add(profesor);
+    }
+    
+    public void mostrarInformacionCursos() {
+        for (Curso curso : cursosDisponibles) {
+            curso.mostrarInformacion();
+        }
+    }
+}
+ 
+public class Main {
+    public static void main(String[] args) {
+        SistemaGestion sistema = new SistemaGestion();
+        
+        Profesor profesor1 = new Profesor("Juan", "Pérez", "P001");
+        Profesor profesor2 = new Profesor("Ana", "López", "P002");
+        
+        Estudiante estudiante1 = new Estudiante("Carlos", "García", "E001");
+        Estudiante estudiante2 = new Estudiante("María", "Rodríguez", "E002");
+        
+        Curso curso1 = new Curso("Matemáticas", profesor1);
+        Curso curso2 = new Curso("Programación", profesor2);
+        
+        sistema.agregarProfesor(profesor1);
+        sistema.agregarProfesor(profesor2);
+        
+        sistema.agregarEstudiante(estudiante1);
+        sistema.agregarEstudiante(estudiante2);
+        
+        sistema.agregarCurso(curso1);
+        sistema.agregarCurso(curso2);
+        
+        curso1.inscribirEstudiante(estudiante1);
+        curso2.inscribirEstudiante(estudiante2);
+        
+        sistema.mostrarInformacionCursos();
+    }
+}
+
