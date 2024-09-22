@@ -1,0 +1,102 @@
+/*************************************************************************************************
+ARCHIVO		: HABITACION.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Una clase simple que representa un objeto con algunos atributos y métodos.
+*************************************************************************************************/
+
+Import practicasLP3;
+
+public class Habitacion {
+    private int numeroHabitacion;
+    private String tipo; // Individual, doble, suite, etc.
+    private boolean disponible;
+    private double precioBase;
+    private List<Reserva> reservas;
+
+    // Constructor
+    public Habitacion(int numeroHabitacion, String tipo, double precioBase) {
+        this.numeroHabitacion = numeroHabitacion;
+        this.tipo = tipo;
+        this.precioBase = precioBase;
+        this.disponible = true;
+        this.reservas = new ArrayList<>();
+    }
+
+    // Método 1: Verificar la disponibilidad de la habitación en un rango de fechas.
+    public boolean verificarDisponibilidad(Date fechaInicio, Date fechaFin) {
+        for (Reserva reserva : reservas) {
+            if (reserva.interseccionFechas(fechaInicio, fechaFin)) {
+                return false; // Si hay una reserva que interfiere, no está disponible
+            }
+        }
+        return true; // Está disponible si no hay conflictos de fechas
+    }
+
+    // Método 2: Marcar la habitación como reservada o disponible.
+    public void cambiarEstado(boolean estado) {
+        this.disponible = estado;
+    }
+
+    // Método 3: Calcular el precio de la habitación según la temporada o promociones.
+    public double calcularPrecio(Temporada temporada, Promocion promocion) {
+        double precioFinal = this.precioBase;
+        if (temporada != null) {
+            precioFinal += temporada.getIncremento(); // Sumar el incremento por temporada alta
+        }
+        if (promocion != null) {
+            precioFinal -= promocion.getDescuento(); // Restar el descuento por promoción
+        }
+        return precioFinal;
+    }
+
+    // Método 4: Generar informes de ocupación de la habitación.
+    public String generarInformeOcupacion(Date fechaInicio, Date fechaFin) {
+        int diasOcupados = 0;
+        for (Reserva reserva : reservas) {
+            diasOcupados += reserva.calcularDiasOcupacion(fechaInicio, fechaFin);
+        }
+        return "Habitación " + numeroHabitacion + ": Ocupada " + diasOcupados + " días en el rango seleccionado.";
+    }
+
+    // Métodos adicionales: Getters, Setters, etc.
+}
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Una clase que gestiona la disponibilidad de las habitaciones en un hotel.
+*************************************************************************************************/
+
+import java.util.Date;
+import java.util.List;
+
+public class GestorDisponibilidadHabitacion {
+    private List<Reserva> reservas;
+    private CalendarioPromociones calendarioPromociones;
+
+    // Constructor
+    public GestorDisponibilidadHabitacion(List<Reserva> reservas, CalendarioPromociones calendarioPromociones) {
+        this.reservas = reservas;
+        this.calendarioPromociones = calendarioPromociones;
+    }
+
+    // Método para verificar la disponibilidad de la habitación en un rango de fechas.
+    public boolean verificarDisponibilidad(Habitacion habitacion, Date fechaInicio, Date fechaFin) {
+        for (Reserva reserva : reservas) {
+            if (reserva.getHabitacion().equals(habitacion) && reserva.interseccionFechas(fechaInicio, fechaFin)) {
+                return false; // No está disponible si hay una reserva que interfiere
+            }
+        }
+        return true; // Está disponible si no hay conflictos de fechas
+    }
+
+    // Método para generar informes de ocupación de la habitación.
+    public String generarInformeOcupacion(Habitacion habitacion, Date fechaInicio, Date fechaFin) {
+        int diasOcupados = 0;
+        for (Reserva reserva : reservas) {
+            if (reserva.getHabitacion().equals(habitacion)) {
+                diasOcupados += reserva.calcularDiasOcupacion(fechaInicio, fechaFin);
+            }
+        }
+        return "Habitación " + habitacion.getNumeroHabitacion() + ": Ocupada " + diasOcupados + " días en el rango seleccionado.";
+    }
+}
