@@ -1,0 +1,92 @@
+/***********************************************************************************************
+ARCHIVO     : REPORTETRANSACCIONES.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Clase para generar reportes de transacciones de una cuenta bancaria.
+***********************************************************************************************/
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+class HistorialVacioException extends Exception {
+    public HistorialVacioException(String mensaje) {
+        super(mensaje);
+    }
+}
+
+public class ReporteTransacciones {
+    private String numeroCuenta;
+    private String titular;
+    private double saldo;
+    private boolean tieneTransacciones;
+
+    public ReporteTransacciones(String numeroCuenta, String titular, double saldo, boolean tieneTransacciones) {
+        this.numeroCuenta = numeroCuenta;
+        this.titular = titular;
+        this.saldo = saldo;
+        this.tieneTransacciones = tieneTransacciones;
+    }
+
+    // A) Método para generar reportes de transacciones y manejar archivos
+    public void generarReporte(String nombreArchivo) throws HistorialVacioException, IOException {
+        if (!tieneTransacciones) {
+            throw new HistorialVacioException("No se puede generar el reporte: la cuenta no tiene transacciones.");
+        }
+        
+        // try-with-resources para garantizar el cierre del archivo
+        try (FileWriter fileWriter = new FileWriter(nombreArchivo, true); 
+             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+            printWriter.println("Número de Cuenta: " + numeroCuenta);
+            printWriter.println("Titular: " + titular);
+            printWriter.println("Saldo: " + saldo);
+            printWriter.println("----------------------------");
+        } catch (IOException e) {
+            throw new IOException("Error al escribir el archivo de reporte.", e);
+        }
+    }
+
+    // B) Método para leer datos de un archivo utilizando Scanner
+    public static void leerDatos(String nombreArchivo) throws FileNotFoundException {
+        // try-with-resources para garantizar el cierre del Scanner
+        try (Scanner scanner = new Scanner(new File(nombreArchivo))) {
+            while (scanner.hasNextLine()) {
+                String linea = scanner.nextLine();
+                System.out.println(linea);
+            }
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException("El archivo " + nombreArchivo + " no existe.");
+        }
+    }
+
+    public static void main(String[] args) {
+        // C) Pruebas para las excepciones y manejo de archivos
+        ReporteTransacciones cuenta1 = new ReporteTransacciones("123456", "Juan Pérez", 2500.0, false);
+        ReporteTransacciones cuenta2 = new ReporteTransacciones("654321", "Ana Martínez", 4000.0, true);
+
+        // Prueba de HistorialVacioException
+        try {
+            cuenta1.generarReporte("reporte.txt");
+        } catch (HistorialVacioException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error al generar el reporte: " + e.getMessage());
+        }
+
+        // Prueba de generación de reporte con transacciones
+        try {
+            cuenta2.generarReporte("reporte.txt");
+        } catch (HistorialVacioException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Prueba de FileNotFoundException al leer archivo inexistente
+        try {
+            leerDatos("transacciones.txt");
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
