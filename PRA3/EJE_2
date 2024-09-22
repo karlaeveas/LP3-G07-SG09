@@ -1,0 +1,60 @@
+/***********************************************************************************************
+ARCHIVO     : DIBUJABLE.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Interfaz que representa una forma que se puede dibujar.
+***********************************************************************************************/
+
+public interface Dibujable {
+    void dibujar();
+}
+/***********************************************************************************************
+ARCHIVO     : CIRCULO.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Clase que representa un círculo y lo dibuja.
+***********************************************************************************************/
+
+public class Circulo implements Dibujable {
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un Círculo");
+    }
+}
+/***********************************************************************************************
+ARCHIVO     : RECTANGULO.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Clase que representa un rectángulo y lo dibuja.
+***********************************************************************************************/
+
+public class Rectangulo implements Dibujable {
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un Rectángulo");
+    }
+}
+/***********************************************************************************************
+ARCHIVO     : TRIANGULO.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Clase que representa un triángulo y lo dibuja.
+***********************************************************************************************/
+
+public class Triangulo implements Dibujable {
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un Triángulo");
+    }
+}
+/***********************************************************************************************
+ARCHIVO     : MAIN.JAVA
+FECHA       : 04/08/2024
+DESCRIPCIÓN : Clase de prueba para dibujar diferentes formas geométricas.
+***********************************************************************************************/
+
+public class Main {
+    public static void main(String[] args) {
+        Dibujable[] formas = { new Circulo(), new Rectangulo(), new Triangulo() };
+        
+        for (Dibujable forma : formas) {
+            forma.dibujar();
+        }
+    }
+}
