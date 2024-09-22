@@ -1,0 +1,143 @@
+/***********************************************************************************************
+ARCHIVO		: CUENTACREDITO.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase que representa una cuenta de crédito, permitiendo gestionar límites de crédito.
+***********************************************************************************************/
+
+public class CuentaCredito extends CuentaBancaria {
+
+    private double limiteCredito;
+
+    public CuentaCredito(String numeroCuenta, String titular, double saldo, double limiteCredito) {
+        super(numeroCuenta, titular, saldo);
+        if (limiteCredito < 0) {
+            throw new IllegalArgumentException("El límite de crédito no puede ser negativo.");
+        }
+        this.limiteCredito = limiteCredito;
+    }
+    @Override
+    public void retirar(double monto) throws SaldoInsuficienteException, LimiteCreditoExcedidoException {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a retirar debe ser positivo.");
+        }
+        double totalDisponible = getSaldo() + limiteCredito; // Suma saldo y límite de crédito
+        if (monto > totalDisponible) {
+            throw new LimiteCreditoExcedidoException("El monto a retirar excede el límite de crédito.");
+        }
+        // Si el saldo no es suficiente, se permite el retiro hasta el límite de crédito
+        if (monto > getSaldo()) {
+            double diferencia = monto - getSaldo();
+            // Aquí restamos del límite de crédito
+            // Decrementamos el saldo a cero y restamos del límite de crédito
+            setSaldo(0);
+            limiteCredito -= diferencia;
+        } else {
+            super.retirar(monto); // Llamamos al método de la clase padre
+        }
+    }
+    @Override
+    public void transferir(CuentaBancaria destino, double monto) throws CuentaNoEncontradaException, SaldoInsuficienteException, LimiteCreditoExcedidoException {
+        if (destino == null) {
+            throw new CuentaNoEncontradaException("La cuenta destino no existe.");
+        }
+        double totalDisponible = getSaldo() + limiteCredito; // Suma saldo y límite de crédito
+        if (monto > totalDisponible) {
+            throw new LimiteCreditoExcedidoException("El monto a transferir excede el límite de crédito.");
+        }
+        // Si el saldo no es suficiente, se permite la transferencia hasta el límite de crédito
+        if (monto > getSaldo()) {
+            double diferencia = monto - getSaldo();
+            setSaldo(0);
+            limiteCredito -= diferencia;
+        } else {
+            super.transferir(destino, monto); // Llamamos al método de la clase padre
+        }
+        destino.depositar(monto);
+    }
+    // Getter para límite de crédito
+    public double getLimiteCredito() {
+        return limiteCredito;
+    }
+}
+/***********************************************************************************************
+ARCHIVO		: PRUEBASRETIROSTRANSFERENCIAS.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Pruebas para retiros y transferencias en cuentas con y sin límite de crédito.
+***********************************************************************************************/
+
+public class PruebasRetirosTransferencias {
+
+    public static void main(String[] args) {
+        
+        // Crear cuentas bancarias
+        CuentaBancaria cuentaSinCredito = new CuentaBancaria("123462", "Ana Torres", 500.0);
+        CuentaCredito cuentaConCredito = new CuentaCredito("123463", "Pedro Martínez", 200.0, 300.0);
+
+        // Pruebas de retiros en cuenta sin límite de crédito
+        System.out.println("\nPruebas de retiros en cuenta sin límite de crédito:");
+        try {
+            cuentaSinCredito.retirar(200.0);
+            System.out.println("Retiro exitoso: 200.0");
+            cuentaSinCredito.mostrarInformacion();
+        } catch (SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar retiro: " + e.getMessage());
+        }
+
+        try {
+            cuentaSinCredito.retirar(400.0); // Debería fallar
+        } catch (SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar retiro: " + e.getMessage());
+        }
+
+        // Pruebas de retiros en cuenta con límite de crédito
+        System.out.println("\nPruebas de retiros en cuenta con límite de crédito:");
+        try {
+            cuentaConCredito.retirar(450.0); // 200 (saldo) + 300 (límite) = 500
+            System.out.println("Retiro exitoso: 450.0");
+            cuentaConCredito.mostrarInformacion();
+        } catch (SaldoInsuficienteException | LimiteCreditoExcedidoException e) {
+            System.out.println("Excepción al realizar retiro: " + e.getMessage());
+        }
+
+        try {
+            cuentaConCredito.retirar(600.0); // Debería fallar
+        } catch (SaldoInsuficienteException | LimiteCreditoExcedidoException e) {
+            System.out.println("Excepción al realizar retiro: " + e.getMessage());
+        }
+
+        // Pruebas de transferencias en cuenta sin límite de crédito
+        System.out.println("\nPruebas de transferencias en cuenta sin límite de crédito:");
+        CuentaBancaria cuentaDestino = new CuentaBancaria("123464", "Laura Gómez", 300.0);
+        
+        try {
+            cuentaSinCredito.transferir(cuentaDestino, 100.0);
+            System.out.println("Transferencia exitosa: 100.0");
+            cuentaSinCredito.mostrarInformacion();
+            cuentaDestino.mostrarInformacion();
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+
+        try {
+            cuentaSinCredito.transferir(cuentaDestino, 600.0); // Debería fallar
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+
+        // Pruebas de transferencias en cuenta con límite de crédito
+        System.out.println("\nPruebas de transferencias en cuenta con límite de crédito:"); 
+        try {
+            cuentaConCredito.transferir(cuentaDestino, 350.0); // 200 (saldo) + 300 (límite) = 500
+            System.out.println("Transferencia exitosa: 350.0");
+            cuentaConCredito.mostrarInformacion();
+            cuentaDestino.mostrarInformacion();
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException | LimiteCreditoExcedidoException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+        try {
+            cuentaConCredito.transferir(cuentaDestino, 700.0); // Debería fallar
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException | LimiteCreditoExcedidoException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+    }
+}
