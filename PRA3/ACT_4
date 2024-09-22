@@ -1,0 +1,54 @@
+/*************************************************************************************************
+ARCHIVO		: NOTIFICADORRESERVA.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Implementación del Principio de Inversión de Dependencias con la interfaz CanalNotificacion.
+*************************************************************************************************/
+
+public interface CanalNotificacion {
+    void enviarNotificacion(String mensaje);
+}
+
+public class EnviadorCorreo implements CanalNotificacion {
+    @Override
+    public void enviarNotificacion(String mensaje) {
+        // Código para enviar un correo electrónico
+        System.out.println("Enviando correo: " + mensaje);
+    }
+}
+
+public class EnviadorSMS implements CanalNotificacion {
+    @Override
+    public void enviarNotificacion(String mensaje) {
+        // Código para enviar un SMS
+        System.out.println("Enviando SMS: " + mensaje);
+    }
+}
+
+public class NotificadorSlack implements CanalNotificacion {
+    @Override
+    public void enviarNotificacion(String mensaje) {
+        // Código para enviar una notificación a Slack (simulado aquí)
+        System.out.println("Enviando notificación a Slack: " + mensaje);
+    }
+}
+
+public class NotificadorReserva {
+
+    private CanalNotificacion canalNotificacion;
+
+    public NotificadorReserva(CanalNotificacion canalNotificacion) {
+        this.canalNotificacion = canalNotificacion; // Inyección de dependencia
+    }
+
+    public void enviarNotificacion(String mensaje) {
+        canalNotificacion.enviarNotificacion(mensaje);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CanalNotificacion canal = new EnviadorCorreo(); // O cambiar a EnviadorSMS o NotificadorSlack
+        NotificadorReserva notificador = new NotificadorReserva(canal);
+        notificador.enviarNotificacion("Reserva Confirmada");
+    }
+}
