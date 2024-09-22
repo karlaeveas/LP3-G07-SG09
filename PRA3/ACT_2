@@ -1,0 +1,142 @@
+/*************************************************************************************************
+ARCHIVO		: POLITICACANCELACION.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Una interfaz que define el método para determinar si una reserva puede ser cancelada según una política específica.
+*************************************************************************************************/
+
+public interface PoliticaCancelacion {
+    boolean puedeCancelar(Reserva reserva);
+}
+/*************************************************************************************************
+ARCHIVO		: POLITICACANCELACIONFLEXIBLE.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Política de cancelación que permite cancelar hasta 24 horas antes del check-in sin penalización.
+*************************************************************************************************/
+
+import java.util.Date;
+
+public class PoliticaCancelacionFlexible implements PoliticaCancelacion {
+
+    @Override
+    public boolean puedeCancelar(Reserva reserva) {
+        Date ahora = new Date();
+        long diferenciaHoras = (reserva.getFechaCheckIn().getTime() - ahora.getTime()) / (1000 * 60 * 60);
+        return diferenciaHoras >= 24;
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: POLITICACANCELACIONMODERADA.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Política de cancelación que permite cancelar hasta 72 horas antes del check-in con una penalización del 50%.
+*************************************************************************************************/
+
+import java.util.Date;
+
+public class PoliticaCancelacionModerada implements PoliticaCancelacion {
+
+    @Override
+    public boolean puedeCancelar(Reserva reserva) {
+        Date ahora = new Date();
+        long diferenciaHoras = (reserva.getFechaCheckIn().getTime() - ahora.getTime()) / (1000 * 60 * 60);
+        if (diferenciaHoras >= 72) {
+            // Se aplicaría una penalización del 50%
+            return true;
+        }
+        return false;
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: POLITICACANCELACIONESTRICTA.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Política de cancelación que no permite cancelaciones después de realizar la reserva.
+*************************************************************************************************/
+
+public class PoliticaCancelacionEstricta implements PoliticaCancelacion {
+
+    @Override
+    public boolean puedeCancelar(Reserva reserva) {
+        return false; // No permite cancelaciones en ningún momento
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: RESERVA.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Clase que representa una reserva en el sistema de gestión de reservas de hotel.
+*************************************************************************************************/
+
+import java.util.Date;
+
+public class Reserva {
+    private Habitacion habitacion;
+    private Cliente cliente;
+    private Date fechaInicio;
+    private Date fechaFin;
+    private PoliticaCancelacion politicaCancelacion; // Nuevo atributo
+
+    // Constructor
+    public Reserva(Habitacion habitacion, Cliente cliente, Date fechaInicio, Date fechaFin, PoliticaCancelacion politicaCancelacion) {
+        this.habitacion = habitacion;
+        this.cliente = cliente;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.politicaCancelacion = politicaCancelacion; // Inicialización de la política de cancelación
+    }
+
+    // Método para cancelar la reserva utilizando la política de cancelación
+    public boolean cancelarReserva() {
+        if (politicaCancelacion.puedeCancelar(this)) {
+            // Aplicar penalización o lógica de cancelación
+            return true; // Reserva cancelada exitosamente
+        }
+        return false; // No se pudo cancelar
+    }
+
+    // Métodos adicionales: Getters, Setters, etc.
+}
+/*************************************************************************************************
+ARCHIVO		: CONTROLADORRESERVAS.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Un controlador que maneja las operaciones de reserva y disponibilidad de habitaciones.
+*************************************************************************************************/
+
+import java.util.Date;
+import java.util.List;
+
+public class ControladorReservas {
+    private List<Habitacion> habitaciones;
+    private GestorDisponibilidadHabitacion gestorDisponibilidad;
+
+    // Constructor
+    public ControladorReservas(List<Habitacion> habitaciones, GestorDisponibilidadHabitacion gestorDisponibilidad) {
+        this.habitaciones = habitaciones;
+        this.gestorDisponibilidad = gestorDisponibilidad;
+    }
+
+    // Método para crear una nueva reserva
+    public boolean crearReserva(Habitacion habitacion, Date fechaInicio, Date fechaFin, Cliente cliente, PoliticaCancelacion politicaCancelacion) {
+        if (gestorDisponibilidad.verificarDisponibilidad(habitacion, fechaInicio, fechaFin)) {
+            Reserva nuevaReserva = new Reserva(habitacion, cliente, fechaInicio, fechaFin, politicaCancelacion);
+            habitacion.getReservas().add(nuevaReserva);
+            return true; // Reserva creada exitosamente
+        } else {
+            return false; // No disponible
+        }
+    }
+
+    // Método para cancelar una reserva
+    public boolean cancelarReserva(Reserva reserva) {
+        return reserva.cancelarReserva(); // Utiliza la política de cancelación asociada
+    }
+
+    // Método para consultar la disponibilidad de una habitación
+    public boolean consultarDisponibilidad(Habitacion habitacion, Date fechaInicio, Date fechaFin) {
+        return gestorDisponibilidad.verificarDisponibilidad(habitacion, fechaInicio, fechaFin);
+    }
+
+    // Método para generar un informe de ocupación
+    public String obtenerInformeOcupacion(Habitacion habitacion, Date fechaInicio, Date fechaFin) {
+        return gestorDisponibilidad.generarInformeOcupacion(habitacion, fechaInicio, fechaFin);
+    }
+
+    // Métodos adicionales: Getters, Setters, etc.
+}
