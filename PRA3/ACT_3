@@ -1,0 +1,127 @@
+/*************************************************************************************************
+ARCHIVO		: RESERVA.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Clase que representa una reserva en el sistema de gestión de reservas de hotel.
+*************************************************************************************************/
+
+import java.util.Date;
+
+public class Reserva {
+    private Habitacion habitacion;
+    private Cliente cliente;
+    private Date fechaInicio;
+    private Date fechaFin;
+
+    public Reserva(Habitacion habitacion, Cliente cliente, Date fechaInicio, Date fechaFin) {
+        this.habitacion = habitacion;
+        this.cliente = cliente;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+    }
+
+    // Método para cancelar la reserva
+    public boolean cancelarReserva(boolean politicaFlexible, boolean politicaModerada) {
+        Date ahora = new Date();
+        long diferenciaHoras = (fechaInicio.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+
+        if (politicaFlexible && diferenciaHoras >= 24) {
+            return true; // Cancelación exitosa
+        } else if (politicaModerada && diferenciaHoras >= 72) {
+            // Aplicar penalización del 50%
+            return true; // Cancelación exitosa
+        } else {
+            return false; // No se puede cancelar
+        }
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: HABITACION.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Clase que representa una habitación y sus servicios.
+*************************************************************************************************/
+
+public class Habitacion implements ServicioHabitacion {
+
+    @Override
+    public void solicitarLimpieza() {
+        // Implementación del servicio de limpieza
+    }
+
+    @Override
+    public void solicitarComida() {
+        // Implementación del servicio de comida
+    }
+
+    @Override
+    public void solicitarLavanderia() {
+        // Implementación del servicio de lavandería
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: HABITACIONBASIC.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Implementación de una habitación básica que solo ofrece el servicio de limpieza.
+*************************************************************************************************/
+
+public class HabitacionBasica implements ServicioLimpieza {
+
+    @Override
+    public void solicitarLimpieza() {
+        // Implementación del servicio de limpieza para habitación básica
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: HABITACIONCONSERVICIOS.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Implementación de una habitación que ofrece todos los servicios: limpieza, comida y lavandería.
+*************************************************************************************************/
+
+public class HabitacionConServicios implements ServicioLimpieza, ServicioComida, ServicioLavanderia {
+
+    @Override
+    public void solicitarLimpieza() {
+        // Implementación del servicio de limpieza
+    }
+
+    @Override
+    public void solicitarComida() {
+        // Implementación del servicio de comida
+    }
+
+    @Override
+    public void solicitarLavanderia() {
+        // Implementación del servicio de lavandería
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: CONTROLADOR.JAVA
+FECHA		: 12/09/2024
+DESCRIPCIÓN	: Controlador que maneja las operaciones relacionadas con las habitaciones y sus servicios.
+*************************************************************************************************/
+
+public class Controlador {
+
+    public void solicitarServicioLimpieza(Habitacion habitacion) {
+        if (habitacion instanceof ServicioLimpieza) {
+            ((ServicioLimpieza) habitacion).solicitarLimpieza();
+        } else {
+            System.out.println("Servicio de limpieza no disponible para esta habitación.");
+        }
+    }
+
+    public void solicitarComida(Habitacion habitacion) {
+        if (habitacion instanceof ServicioComida) {
+            ((ServicioComida) habitacion).solicitarComida();
+        } else {
+            System.out.println("Servicio de comida no disponible para esta habitación.");
+        }
+    }
+
+    public void solicitarLavanderia(Habitacion habitacion) {
+        if (habitacion instanceof ServicioLavanderia) {
+            ((ServicioLavanderia) habitacion).solicitarLavanderia();
+        } else {
+            System.out.println("Servicio de lavandería no disponible para esta habitación.");
+        }
+    }
+}
