@@ -1,1 +1,104 @@
-//HOLA
+import java.io.IOException;  // Importar IOException
+ 
+public class Main {
+    public static void main(String[] args) {
+        ProcesadorCaracteres procesador = new ProcesadorCaracteres(System.in);
+        boolean continuar = true;
+ 
+        while (continuar) {
+            try {
+                procesador.procesar();
+            } catch (ExcepcionVocal e) {
+                System.out.println(e.getMessage());
+            } catch (ExcepcionNumero e) {
+                System.out.println(e.getMessage());
+            } catch (ExcepcionBlanco e) {
+                System.out.println(e.getMessage());
+            } catch (ExcepcionSalida e) {
+                System.out.println(e.getMessage());
+                continuar = false;
+            } catch (IOException e) {
+                System.out.println("Error de entrada/salida: " + e.getMessage());
+            }
+        }
+ 
+        System.out.println("Programa terminado.");
+    }
+}
+CLASE LeerEntrada.java
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+ 
+public class LeerEntrada {
+    private Reader stream;
+ 
+    /**
+     * Constructor
+     * @param fuente la fuente de datos
+     */
+    public LeerEntrada(InputStream fuente) {
+        stream = new InputStreamReader(fuente);
+    }
+ 
+    /**
+     * Obtiene el siguiente carácter del teclado.
+     * @return el carácter escrito
+     * @throws IOException
+     */
+    public char getChar() throws IOException {
+        return (char) this.stream.read();
+    }
+}
+CLASE ProcesadorCaracteres.java
+import java.io.IOException;  // Importar IOException
+import java.io.InputStream;  // Importar InputStream
+ 
+public class ProcesadorCaracteres {
+    private LeerEntrada lector;
+ 
+    public ProcesadorCaracteres(InputStream fuente) {
+        lector = new LeerEntrada(fuente);
+    }
+ 
+    public void procesar() throws IOException, ExcepcionVocal, ExcepcionNumero, ExcepcionBlanco, ExcepcionSalida {
+        char c = lector.getChar();
+ 
+        if (Character.isDigit(c)) {
+            throw new ExcepcionNumero(c);
+        } else if ("AEIOUaeiou".indexOf(c) != -1) {
+            throw new ExcepcionVocal(c);
+        } else if (Character.isWhitespace(c)) {
+            throw new ExcepcionBlanco();
+        } else if (c == 'X') {  // Suponemos que 'X' es el carácter de salida
+            throw new ExcepcionSalida();
+        }
+    }
+}
+CLASE ExcepcionVocal.java
+class ExcepcionVocal extends Exception {
+    public ExcepcionVocal(char c) {
+        super("Se leyó una vocal: " + c);
+    }
+}
+ 
+class ExcepcionNumero extends Exception {
+    public ExcepcionNumero(char c) {
+        super("Se leyó un número: " + c);
+    }
+}
+ 
+class ExcepcionBlanco extends Exception {
+    public ExcepcionBlanco() {
+        super("Se leyó un espacio en blanco.");
+    }
+}
+ 
+class ExcepcionSalida extends Exception {
+    public ExcepcionSalida() {
+        super("Se leyó el carácter de salida.");
+    }
+}
+
+
