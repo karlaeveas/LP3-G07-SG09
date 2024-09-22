@@ -1,0 +1,131 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Una clase simple que representa un objeto con algunos atributos y métodos.
+*************************************************************************************************/
+
+public class CuentaBancaria {
+    private String numeroCuenta;
+    private String titular;
+    private double saldo;
+
+    public CuentaBancaria(String numeroCuenta, String titular, double saldo) {
+        if (saldo < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo.");
+        }
+        this.numeroCuenta = numeroCuenta;
+        this.titular = titular;
+        this.saldo = saldo;
+    }
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
+
+    public void setNumeroCuenta(String numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+    }
+
+    public String getTitular() {
+        return titular;
+    }
+
+    public void setTitular(String titular) {
+        this.titular = titular;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
+
+    //Método para depositar dinero en la cuenta.
+    public void depositar(double monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a depositar debe ser positivo.");
+        }
+        saldo += monto;
+    }
+
+    //Método para retirar dinero de la cuenta.
+    public void retirar(double monto) throws SaldoInsuficienteException {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a retirar debe ser positivo.");
+        }
+        if (monto > saldo) {
+            throw new SaldoInsuficienteException("Saldo insuficiente para realizar el retiro.");
+        }
+        saldo -= monto;
+    }
+    public void mostrarInformacion() {
+        System.out.println("Número de cuenta: " + numeroCuenta);
+        System.out.println("Titular: " + titular);
+        System.out.println("Saldo: " + saldo);
+    }
+}
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Pruebas para la clase CuentaBancaria, validando excepciones y operaciones.
+*************************************************************************************************/
+
+public class PruebasCuentaBancaria {
+
+    public static void main(String[] args) {
+        
+        // Prueba de creación de cuentas
+        try {
+            System.out.println("Creando cuenta con saldo positivo...");
+            CuentaBancaria cuentaValida = new CuentaBancaria("123456", "Juan Pérez", 500.0);
+            cuentaValida.mostrarInformacion();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Excepción al crear cuenta: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\nCreando cuenta con saldo negativo...");
+            CuentaBancaria cuentaInvalida = new CuentaBancaria("123457", "María López", -100.0);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Excepción al crear cuenta: " + e.getMessage());
+        }
+
+        // Prueba de depósitos
+        try {
+            CuentaBancaria cuentaDeposito = new CuentaBancaria("123458", "Carlos Gómez", 100.0);
+            System.out.println("\nDepositando monto válido...");
+            cuentaDeposito.depositar(200.0);
+            cuentaDeposito.mostrarInformacion();
+
+            System.out.println("\nIntentando depositar monto inválido...");
+            cuentaDeposito.depositar(-50.0);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Excepción al depositar: " + e.getMessage());
+        }
+
+        // Prueba de retiros
+        try {
+            CuentaBancaria cuentaRetiro = new CuentaBancaria("123459", "Ana Torres", 300.0);
+            System.out.println("\nRetirando monto válido...");
+            cuentaRetiro.retirar(100.0);
+            cuentaRetiro.mostrarInformacion();
+
+            System.out.println("\nIntentando retirar monto mayor al saldo disponible...");
+            cuentaRetiro.retirar(500.0);
+        } catch (IllegalArgumentException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al retirar: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\nIntentando retirar monto negativo...");
+            CuentaBancaria cuentaRetiroInvalido = new CuentaBancaria("123460", "Pedro Sánchez", 150.0);
+            cuentaRetiroInvalido.retirar(-20.0);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Excepción al retirar: " + e.getMessage());
+        } catch (SaldoInsuficienteException e) {
+            System.out.println("Saldo insuficiente: " + e.getMessage());
+        }
+    }
+}
+
