@@ -1,0 +1,50 @@
+public class Main {
+ 
+    public static void main(String[] args) {
+        try {
+            // Crear un objeto Numero con un valor positivo
+            Numero numero = new Numero(10);
+            System.out.println("Valor inicial: " + numero.getValor());
+ 
+            // Intentar establecer un valor negativo (esto lanzará IllegalArgumentException)
+            numero.setValor(-5);
+ 
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());  // Captura y maneja IllegalArgumentException
+        }
+ 
+        try {
+            // Crear otro objeto Numero con un valor negativo (esto lanzará IllegalArgumentException)
+            Numero numeroNegativo = new Numero(-15);
+ 
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());  // Captura y maneja IllegalArgumentException
+        }
+    }
+}
+
+CLASE Numero.java
+public class Numero {
+ 
+    // Atributo para almacenar el valor
+    private double valor;
+ 
+    // Constructor
+    public Numero(double valor) {
+        setValor(valor); // Se utiliza el método setValor para validar el valor en el constructor
+    }
+ 
+    // Método para establecer el valor
+    public void setValor(double valor) {
+        if (valor < 0) {
+            throw new IllegalArgumentException("El valor no puede ser negativo.");
+        }
+        this.valor = valor;
+    }
+ 
+    // Método para obtener el valor
+    public double getValor() {
+        return valor;
+    }
+}
+
