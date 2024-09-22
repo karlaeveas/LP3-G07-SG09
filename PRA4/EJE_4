@@ -1,0 +1,67 @@
+CLASE Main.java
+import java.util.NoSuchElementException; // Importa la clase NoSuchElementException
+ 
+public class Main {
+ 
+    public static void main(String[] args) {
+        RegistroEstudiantes registro = new RegistroEstudiantes();
+ 
+        try {
+            // Agregar estudiantes válidos
+            registro.agregarEstudiante("Juan");
+            registro.agregarEstudiante("Maria");
+            registro.agregarEstudiante("Carlos");
+ 
+            // Intento de agregar un estudiante con nombre nulo o vacío
+            registro.agregarEstudiante("");
+ 
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());  // Captura y maneja IllegalArgumentException
+        }
+ 
+        try {
+            // Buscar estudiante existente
+            System.out.println("Estudiante encontrado: " + registro.buscarEstudiante("Maria"));
+ 
+            // Buscar estudiante que no existe (lanzará NoSuchElementException)
+            System.out.println("Estudiante encontrado: " + registro.buscarEstudiante("Pedro"));
+ 
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());  // Captura y maneja NoSuchElementException
+        }
+    }
+}
+CLASE RegistroEstudiantes.java
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+ 
+public class RegistroEstudiantes {
+ 
+    // Lista para almacenar los nombres de los estudiantes
+    private ArrayList<String> estudiantes;
+ 
+    // Constructor
+    public RegistroEstudiantes() {
+        estudiantes = new ArrayList<>();
+    }
+ 
+    // Método para agregar un estudiante
+    public void agregarEstudiante(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del estudiante no puede ser nulo o vacío.");
+        }
+        estudiantes.add(nombre);
+        System.out.println("Estudiante agregado: " + nombre);
+    }
+ 
+    // Método para buscar un estudiante por su nombre
+    public String buscarEstudiante(String nombre) {
+        for (String estudiante : estudiantes) {
+            if (estudiante.equalsIgnoreCase(nombre)) {
+                return estudiante;
+            }
+        }
+        throw new NoSuchElementException("Estudiante no encontrado: " + nombre);
+    }
+}
+
