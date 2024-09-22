@@ -1,0 +1,147 @@
+/***********************************************************************************************
+ARCHIVO		: CUENTABANCARIA.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Una clase que representa una cuenta bancaria con manejo de excepciones personalizadas.
+***********************************************************************************************/
+
+public class CuentaBancaria {
+    // Atributos de la clase
+    private String numeroCuenta;
+    private String titular;
+    private double saldo;
+
+    public CuentaBancaria(String numeroCuenta, String titular, double saldo) {
+        if (saldo < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo.");
+        }
+        this.numeroCuenta = numeroCuenta;
+        this.titular = titular;
+        this.saldo = saldo;
+    }
+
+    // Getters y setters
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
+
+    public void setNumeroCuenta(String numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+    }
+
+    public String getTitular() {
+        return titular;
+    }
+
+    public void setTitular(String titular) {
+        this.titular = titular;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
+
+    // Método para depositar dinero en la cuenta.
+    public void depositar(double monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a depositar debe ser positivo.");
+        }
+        saldo += monto;
+    }
+
+    // Método para retirar dinero de la cuenta.
+    public void retirar(double monto) throws SaldoInsuficienteException {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a retirar debe ser positivo.");
+        }
+        if (monto > saldo) {
+            throw new SaldoInsuficienteException("Saldo insuficiente para realizar el retiro.");
+        }
+        saldo -= monto;
+    }
+
+    // Método para transferir dinero a otra cuenta.
+    public void transferir(CuentaBancaria destino, double monto) throws CuentaNoEncontradaException, SaldoInsuficienteException {
+        if (destino == null) {
+            throw new CuentaNoEncontradaException("La cuenta destino no existe.");
+        }
+        this.retirar(monto);  // Esto lanzará SaldoInsuficienteException si no hay saldo suficiente
+        destino.depositar(monto);  // Depositar en la cuenta destino
+    }
+
+    // Método para cerrar la cuenta.
+    public void cerrarCuenta() throws SaldoNoCeroException {
+        if (saldo > 0) {
+            throw new SaldoNoCeroException("No se puede cerrar la cuenta con saldo positivo.");
+        }
+        // Lógica para cerrar la cuenta (puedes añadir más aquí)
+        System.out.println("La cuenta ha sido cerrada.");
+    }
+
+    // Método para mostrar información de la cuenta.
+    public void mostrarInformacion() {
+        System.out.println("Número de cuenta: " + numeroCuenta);
+        System.out.println("Titular: " + titular);
+        System.out.println("Saldo: " + saldo);
+    }
+}
+/***********************************************************************************************
+ARCHIVO		: PRUEBASCUENTABANCARIA.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Pruebas para la clase CuentaBancaria, validando excepciones y operaciones avanzadas.
+***********************************************************************************************/
+
+public class PruebasCuentaBancaria {
+
+    public static void main(String[] args) {
+        
+        // Crear cuentas para las pruebas
+        CuentaBancaria cuenta1 = new CuentaBancaria("123456", "Juan Pérez", 500.0);
+        CuentaBancaria cuenta2 = new CuentaBancaria("123457", "María López", 300.0);
+        
+        // Prueba de transferencias
+        try {
+            System.out.println("\nTransferencia válida...");
+            cuenta1.transferir(cuenta2, 200.0);
+            cuenta1.mostrarInformacion();
+            cuenta2.mostrarInformacion();
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\nIntentando transferir a una cuenta que no existe...");
+            cuenta1.transferir(null, 100.0);
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\nIntentando transferir más de lo que hay en la cuenta...");
+            cuenta1.transferir(cuenta2, 600.0);
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            System.out.println("Excepción al realizar transferencia: " + e.getMessage());
+        }
+
+        // Prueba de cierre de cuentas
+        try {
+            System.out.println("\nCerrando cuenta con saldo cero...");
+            CuentaBancaria cuentaCierre = new CuentaBancaria("123458", "Carlos Gómez", 0.0);
+            cuentaCierre.cerrarCuenta();  // Debe cerrarse correctamente
+        } catch (SaldoNoCeroException e) {
+            System.out.println("Excepción al cerrar cuenta: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\nCerrando cuenta con saldo positivo...");
+            CuentaBancaria cuentaCierreInvalida = new CuentaBancaria("123459", "Ana Torres", 100.0);
+            cuentaCierreInvalida.cerrarCuenta();
+        } catch (SaldoNoCeroException e) {
+            System.out.println("Excepción al cerrar cuenta: " + e.getMessage());
+        }
+    }
+}
+
