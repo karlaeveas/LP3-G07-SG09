@@ -1,0 +1,45 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase genérica Par con métodos para obtener y establecer el primer y segundo elemento.
+*************************************************************************************************/
+
+public class Par<F, S> {
+    private F primero;
+    private S segundo;
+
+    // Constructor
+    public Par(F primero, S segundo) {
+        this.primero = primero;
+        this.segundo = segundo;
+    }
+
+    // Métodos para obtener el primer y segundo elemento
+    public F getPrimero() {
+        return primero;
+    }
+
+    public S getSegundo() {
+        return segundo;
+    }
+
+    // Métodos para establecer el primer y segundo elemento
+    public void setPrimero(F primero) {
+        this.primero = primero;
+    }
+
+    public void setSegundo(S segundo) {
+        this.segundo = segundo;
+    }
+
+    // Método toString para mostrar el par
+    @Override
+    public String toString() {
+        return String.format("(Primero: %s, Segundo: %s)", primero, segundo);
+    }
+
+    // Método esIgual para comparar dos pares
+    public boolean esIgual(Par<F, S> otroPar) {
+        return this.primero.equals(otroPar.getPrimero()) && this.segundo.equals(otroPar.getSegundo());
+    }
+}
