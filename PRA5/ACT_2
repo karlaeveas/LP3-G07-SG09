@@ -1,0 +1,82 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase genérica Pila que permite apilar elementos, desapilar y buscar un elemento.
+*************************************************************************************************/
+
+public class Pila<E> {
+    private final int tamanio; // número de elementos en la pila
+    private int superior; // ubicación del elemento superior
+    private E[] elementos; // arreglo que almacena los elementos de la pila
+
+    // El constructor sin argumentos crea una pila del tamaño predeterminado
+    public Pila() {
+        this(10); // tamaño predeterminado de la pila
+    }
+
+    // Constructor que crea una pila del número especificado de elementos
+    @SuppressWarnings("unchecked") // suprimir advertencia de conversión genérica
+    public Pila(int s) {
+        tamanio = s > 0 ? s : 10; // establece el tamaño de la Pila
+        superior = -1; // al principio, la pila está vacía
+        elementos = (E[]) new Object[tamanio]; // crea el arreglo
+    }
+
+    // Mete un elemento a la pila; si tiene éxito, devuelve verdadero
+    // En caso contrario, lanza la excepción ExcepcionPilaLlena
+    public void push(E valorAMeter) {
+        if (superior == tamanio - 1) // si la pila está llena
+            throw new ExcepcionPilaLlena(String.format("La Pila está llena, no se puede meter %s", valorAMeter));
+        elementos[++superior] = valorAMeter; // mete valorAMeter en la pila
+    }
+
+    // Devuelve el último elemento o lanza ExcepcionPilaVacia si está vacía
+    public E pop() {
+        if (superior == -1) // si la pila está vacía
+            throw new ExcepcionPilaVacia("Pila vacía, no se puede sacar");
+        return elementos[superior--]; // elimina y devuelve el último
+    }
+
+    // Método contains para buscar un elemento en la pila
+    public boolean contains(E elemento) {
+        // Recorrer la pila desde el tope hasta el fondo
+        for (int i = superior; i >= 0; i--) {
+            if (elementos[i].equals(elemento)) {
+                return true; // Si se encuentra el elemento, retornar true
+            }
+        }
+        return false; // Si no se encuentra el elemento, retornar false
+    }
+
+    public static void main(String[] args) {
+        // Crear una pila de enteros
+        Pila<Integer> pila = new Pila<>(5);
+
+        // Probar push
+        pila.push(10);
+        pila.push(20);
+        pila.push(30);
+
+        // Probar contains
+        System.out.println("¿La pila contiene 20? " + pila.contains(20)); // true
+        System.out.println("¿La pila contiene 40? " + pila.contains(40)); // false
+
+        // Probar pop
+        System.out.println("Elemento sacado de la pila: " + pila.pop()); // 30
+        System.out.println("¿La pila contiene 30? " + pila.contains(30)); // false
+    }
+}
+
+// Definición de excepciones personalizadas para pila llena
+class ExcepcionPilaLlena extends RuntimeException {
+    public ExcepcionPilaLlena(String mensaje) {
+        super(mensaje);
+    }
+}
+
+// Definición de excepciones personalizadas para pila vacía
+class ExcepcionPilaVacia extends RuntimeException {
+    public ExcepcionPilaVacia(String mensaje) {
+        super(mensaje);
+    }
+}
