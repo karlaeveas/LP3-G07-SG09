@@ -1,0 +1,33 @@
+public class Main {
+    public static void main(String[] args) {
+        Par<String, Integer> par1 = new Par<>("Hola", 1);
+        Par<Double, Boolean> par2 = new Par<>(3.14, true);
+        Par<Persona, Integer> par3 = new Par<>(new Persona("Juan", 25), 100);
+
+        // Llamada al método genérico imprimirPar
+        imprimirPar(par1);
+        imprimirPar(par2);
+        imprimirPar(par3);
+    }
+
+    // Método genérico estático para imprimir un par
+    public static <F, S> void imprimirPar(Par<F, S> par) {
+        System.out.println(par);
+    }
+}
+
+// Clase Persona para el ejemplo
+class Persona {
+    private String nombre;
+    private int edad;
+
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " (edad: " + edad + ")";
+    }
+}
