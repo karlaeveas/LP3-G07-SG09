@@ -1,0 +1,46 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase genérica IgualGenerico que compara dos objetos utilizando el método equals.
+*************************************************************************************************/
+
+public class IgualGenerico {
+
+    // Método genérico esIgualA que compara dos argumentos
+    public static <T> boolean esIgualA(T a, T b) {
+        // Si ambos son null, son iguales
+        if (a == null && b == null) {
+            return true;
+        }
+        // Si uno es null y el otro no, no son iguales
+        if (a == null || b == null) {
+            return false;
+        }
+        // Usar el método equals para comparar los objetos
+        return a.equals(b);
+    }
+
+    public static void main(String[] args) {
+        // Comparar objetos de diferentes tipos
+
+        // Comparación de enteros
+        Integer num1 = 100;
+        Integer num2 = 100;
+        System.out.println("¿num1 es igual a num2? " + esIgualA(num1, num2)); // true
+
+        // Comparación de cadenas de texto
+        String str1 = "Hola";
+        String str2 = "Hola";
+        System.out.println("¿str1 es igual a str2? " + esIgualA(str1, str2)); // true
+
+        // Comparación de objetos genéricos
+        Object obj1 = new Object();
+        Object obj2 = new Object();
+        System.out.println("¿obj1 es igual a obj2? " + esIgualA(obj1, obj2)); // false
+
+        // Comparación con null
+        String strNull = null;
+        System.out.println("¿str1 es igual a strNull? " + esIgualA(str1, strNull)); // false
+        System.out.println("¿strNull es igual a strNull? " + esIgualA(strNull, strNull)); // true
+    }
+}
