@@ -1,0 +1,95 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase genérica Pila con el método esIgual para comparar dos pilas.
+*************************************************************************************************/
+
+import java.util.Stack;
+
+public class Pila<E> {
+    private final int tamanio; // número de elementos en la pila
+    private int superior;      // ubicación del elemento superior
+    private E[] elementos;     // arreglo que almacena los elementos de la pila
+
+    // Constructor sin argumentos, crea una pila con tamaño predeterminado de 10
+    public Pila() {
+        this(10);
+    }
+
+    // Constructor que permite especificar el tamaño de la pila
+    public Pila(int s) {
+        tamanio = s > 0 ? s : 10;
+        superior = -1; // al principio, la pila está vacía
+        elementos = (E[]) new Object[tamanio]; // crea el arreglo para almacenar elementos
+    }
+
+    // Método push: mete un elemento en la pila
+    public void push(E valorAMeter) {
+        if (superior == tamanio - 1) { // si la pila está llena
+            throw new IllegalStateException("La pila está llena, no se puede meter " + valorAMeter);
+        }
+        elementos[++superior] = valorAMeter; // mete valor en la pila
+    }
+
+    // Método pop: devuelve el último elemento de la pila o lanza excepción si está vacía
+    public E pop() {
+        if (superior == -1) { // si la pila está vacía
+            throw new IllegalStateException("Pila vacía, no se puede sacar elementos.");
+        }
+        return elementos[superior--]; // elimina y devuelve el último elemento
+    }
+
+    // Método esIgual: compara dos pilas para verificar si son iguales en tamaño y contenido
+    public boolean esIgual(Pila<E> otraPila) {
+        // Si los tamaños no coinciden, las pilas no pueden ser iguales
+        if (this.superior != otraPila.superior) {
+            return false;
+        }
+
+        // Crear copias temporales de ambas pilas para no alterar el estado original
+        Stack<E> copiaPila1 = new Stack<>();
+        Stack<E> copiaPila2 = new Stack<>();
+
+        // Pasar los elementos a las copias de las pilas
+        for (int i = 0; i <= this.superior; i++) {
+            copiaPila1.push(this.elementos[i]);
+            copiaPila2.push(otraPila.elementos[i]);
+        }
+
+        // Comparar los elementos uno por uno
+        while (!copiaPila1.isEmpty()) {
+            E elementoPila1 = copiaPila1.pop();
+            E elementoPila2 = copiaPila2.pop();
+
+            // Si algún elemento no es igual, las pilas no son iguales
+            if (!elementoPila1.equals(elementoPila2)) {
+                return false;
+            }
+        }
+
+        // Si se recorren todos los elementos y son iguales, devolver true
+        return true;
+    }
+
+    // Método main para probar el método esIgual
+    public static void main(String[] args) {
+        Pila<Integer> pila1 = new Pila<>(5);
+        Pila<Integer> pila2 = new Pila<>(5);
+
+        // Agregar los mismos elementos a ambas pilas
+        pila1.push(1);
+        pila1.push(2);
+        pila1.push(3);
+
+        pila2.push(1);
+        pila2.push(2);
+        pila2.push(3);
+
+        // Comparar ambas pilas
+        System.out.println("¿Son las pilas iguales? " + pila1.esIgual(pila2)); // true
+
+        // Modificar una pila y comparar de nuevo
+        pila2.push(4);
+        System.out.println("¿Son las pilas iguales después de modificar? " + pila1.esIgual(pila2)); // false
+    }
+}
