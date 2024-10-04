@@ -1,0 +1,153 @@
+/*************************************************************************************************
+ARCHIVO		: CODIGON002.JAVA
+FECHA		: 04/08/2024
+DESCRIPCIÓN	: Clase genérica Par con métodos para obtener y establecer el primer y segundo elemento,
+              junto con pruebas de comparación de pares, impresión de pares y uso de un contenedor.
+*************************************************************************************************/
+
+import java.util.ArrayList;
+
+// Clase genérica Par
+public class Par<F, S> {
+    private F primero;
+    private S segundo;
+
+    // Constructor
+    public Par(F primero, S segundo) {
+        this.primero = primero;
+        this.segundo = segundo;
+    }
+
+    // Métodos para obtener el primer y segundo elemento
+    public F getPrimero() {
+        return primero;
+    }
+
+    public S getSegundo() {
+        return segundo;
+    }
+
+    // Métodos para establecer el primer y segundo elemento
+    public void setPrimero(F primero) {
+        this.primero = primero;
+    }
+
+    public void setSegundo(S segundo) {
+        this.segundo = segundo;
+    }
+
+    // Método toString para mostrar el par
+    @Override
+    public String toString() {
+        return String.format("(Primero: %s, Segundo: %s)", primero, segundo);
+    }
+
+    // Método esIgual para comparar dos pares
+    public boolean esIgual(Par<F, S> otroPar) {
+        return this.primero.equals(otroPar.getPrimero()) && this.segundo.equals(otroPar.getSegundo());
+    }
+}
+
+// Clase de prueba para Par
+class PruebaPar {
+    public static void main(String[] args) {
+        Par<Integer, String> par1 = new Par<>(1, "Uno");
+        Par<Integer, String> par2 = new Par<>(1, "Uno");
+        Par<Integer, String> par3 = new Par<>(2, "Dos");
+
+        System.out.println("Par 1: " + par1);
+        System.out.println("Par 2: " + par2);
+        System.out.println("Par 3: " + par3);
+
+        // Comparación usando el método esIgual
+        System.out.println("¿Par 1 es igual a Par 2? " + par1.esIgual(par2)); // true
+        System.out.println("¿Par 1 es igual a Par 3? " + par1.esIgual(par3)); // false
+    }
+}
+
+// Clase Main con método genérico imprimirPar
+class Main {
+    public static void main(String[] args) {
+        Par<String, Integer> par1 = new Par<>("Hola", 1);
+        Par<Double, Boolean> par2 = new Par<>(3.14, true);
+        Par<Persona, Integer> par3 = new Par<>(new Persona("Juan", 25), 100);
+
+        // Llamada al método genérico imprimirPar
+        imprimirPar(par1);
+        imprimirPar(par2);
+        imprimirPar(par3);
+    }
+
+    // Método genérico estático para imprimir un par
+    public static <F, S> void imprimirPar(Par<F, S> par) {
+        System.out.println(par);
+    }
+}
+
+// Clase Persona para el ejemplo
+class Persona {
+    private String nombre;
+    private int edad;
+
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " (edad: " + edad + ")";
+    }
+}
+
+// Clase genérica Contenedor para almacenar múltiples pares
+class Contenedor<F, S> {
+    private ArrayList<Par<F, S>> pares;
+
+    // Constructor
+    public Contenedor() {
+        pares = new ArrayList<>();
+    }
+
+    // Método para agregar un nuevo par al contenedor
+    public void agregarPar(F primero, S segundo) {
+        pares.add(new Par<>(primero, segundo));
+    }
+
+    // Método para obtener un par en la posición especificada
+    public Par<F, S> obtenerPar(int indice) {
+        if (indice >= 0 && indice < pares.size()) {
+            return pares.get(indice);
+        }
+        return null;
+    }
+
+    // Método para obtener todos los pares
+    public ArrayList<Par<F, S>> obtenerTodosLosPares() {
+        return pares;
+    }
+
+    // Método para mostrar todos los pares almacenados en el contenedor
+    public void mostrarPares() {
+        for (Par<F, S> par : pares) {
+            System.out.println(par);
+        }
+    }
+
+    // Método main para probar la clase Contenedor
+    public static void main(String[] args) {
+        Contenedor<String, Integer> contenedor = new Contenedor<>();
+
+        // Agregar pares al contenedor
+        contenedor.agregarPar("Uno", 1);
+        contenedor.agregarPar("Dos", 2);
+        contenedor.agregarPar("Tres", 3);
+
+        // Mostrar todos los pares
+        System.out.println("Todos los pares:");
+        contenedor.mostrarPares();
+
+        // Obtener un par específico
+        System.out.println("Par en la posición 1: " + contenedor.obtenerPar(1));
+    }
+}
