@@ -1,0 +1,188 @@
+/********************************************************************************************
+ARCHIVO	       : GestorMascotas.java
+AUTOR		: ESPINO VEAS
+FECHA		: 01/11/2024
+DESCRIPCIÓN	: Clase gestora que maneja operaciones sobre una lista de objetos Mascota, permitiendo realizar consultas personalizadas en base a varios criterios. Incluye métodos para 
+agregar mascotas y consultar registros basados en condiciones, ordenamiento y límite de resultados.
+********************************************************************************************/
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
+
+class Mascota {
+    private int id;
+    private String nombre;
+    private String tipo;
+    private int edad;
+    private String duenio;
+
+    // Constructor
+    public Mascota(int id, String nombre, String tipo, int edad, String duenio) {
+        this.id = id;
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.edad = edad;
+        this.duenio = duenio;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public String getDuenio() {
+        return duenio;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Nombre: " + nombre + ", Tipo: " + tipo + ", Edad: " + edad + ", Dueño: " + duenio;
+    }
+}
+
+class GestorMascotas {
+    private List<Mascota> listaMascotas;
+
+    public GestorMascotas() {
+        this.listaMascotas = new ArrayList<>();
+    }
+
+    // Método para agregar una mascota a la lista
+    public void agregarMascota(Mascota mascota) {
+        listaMascotas.add(mascota);
+    }
+
+    // Método para consultar las mascotas según los criterios dados
+    public void consultarMascotas(String[] campos, String condicionCampo, String condicionValor, String ordenarPor, String orden, int limite) {
+        List<Mascota> resultado = new ArrayList<>(listaMascotas);
+
+        // Filtrar por condición
+        if (condicionCampo != null && condicionValor != null) {
+            resultado.removeIf(mascota -> {
+                switch (condicionCampo.toLowerCase()) {
+                    case "nombre":
+                        return !mascota.getNombre().equalsIgnoreCase(condicionValor);
+                    case "tipo":
+                        return !mascota.getTipo().equalsIgnoreCase(condicionValor);
+                    case "edad":
+                        return mascota.getEdad() != Integer.parseInt(condicionValor);
+                    case "duenio":
+                        return !mascota.getDuenio().equalsIgnoreCase(condicionValor);
+                    default:
+                        return true; // No filtrar si el campo no es válido
+                }
+            });
+        }
+
+        // Ordenar resultados
+        if (ordenarPor != null) {
+            Comparator<Mascota> comparator;
+            switch (ordenarPor.toLowerCase()) {
+                case "nombre":
+                    comparator = Comparator.comparing(Mascota::getNombre);
+                    break;
+                case "tipo":
+                    comparator = Comparator.comparing(Mascota::getTipo);
+                    break;
+                case "edad":
+                    comparator = Comparator.comparing(Mascota::getEdad);
+                    break;
+                case "duenio":
+                    comparator = Comparator.comparing(Mascota::getDuenio);
+                    break;
+                default:
+                    comparator = Comparator.comparingInt(Mascota::getId);
+                    break; // Ordenar por ID si no es un campo válido
+            }
+            if ("descendente".equalsIgnoreCase(orden)) {
+                comparator = comparator.reversed();
+            }
+            resultado.sort(comparator);
+        }
+
+        // Limitar resultados
+        if (limite > 0 && limite < resultado.size()) {
+            resultado = resultado.subList(0, limite);
+        }
+
+        // Mostrar resultados
+        for (Mascota mascota : resultado) {
+            StringBuilder resultadoMostrar = new StringBuilder();
+            for (String campo : campos) {
+                switch (campo.toLowerCase()) {
+                    case "id":
+                        resultadoMostrar.append("ID: ").append(mascota.getId()).append(", ");
+                        break;
+                    case "nombre":
+                        resultadoMostrar.append("Nombre: ").append(mascota.getNombre()).append(", ");
+                        break;
+                    case "tipo":
+                        resultadoMostrar.append("Tipo: ").append(mascota.getTipo()).append(", ");
+                        break;
+                    case "edad":
+                        resultadoMostrar.append("Edad: ").append(mascota.getEdad()).append(", ");
+                        break;
+                    case "duenio":
+                        resultadoMostrar.append("Dueño: ").append(mascota.getDuenio()).append(", ");
+                        break;
+                }
+            }
+            System.out.println(resultadoMostrar.toString());
+        }
+    }
+}
+
+// Clase principal para probar la funcionalidad
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        GestorMascotas gestor = new GestorMascotas();
+
+        // Agregar algunas mascotas para la prueba
+        gestor.agregarMascota(new Mascota(1, "Rex", "Perro", 5, "Juan"));
+        gestor.agregarMascota(new Mascota(2, "Miau", "Gato", 3, "Ana"));
+        gestor.agregarMascota(new Mascota(3, "Luna", "Gato", 2, "Pedro"));
+        gestor.agregarMascota(new Mascota(4, "Firulais", "Perro", 7, "Carlos"));
+
+        // Consulta de ejemplo
+        System.out.println("Consulta de mascotas:");
+        System.out.print("Ingrese los campos a mostrar (separados por comas): ");
+        String[] campos = scanner.nextLine().split(",");
+
+        System.out.print("Ingrese el campo de condición (nombre, tipo, edad, dueño) o dejar vacío: ");
+        String condicionCampo = scanner.nextLine().trim();
+        
+        String condicionValor = null;
+        if (!condicionCampo.isEmpty()) {
+            System.out.print("Ingrese el valor de la condición: ");
+            condicionValor = scanner.nextLine().trim();
+        }
+
+        System.out.print("Ingrese el campo para ordenar (nombre, tipo, edad, dueño) o dejar vacío: ");
+        String ordenarPor = scanner.nextLine().trim();
+
+        System.out.print("Ingrese el orden (ascendente o descendente) o dejar vacío: ");
+        String orden = scanner.nextLine().trim();
+
+        System.out.print("Ingrese la cantidad máxima de registros a mostrar (0 para todos): ");
+        int limite = scanner.nextInt();
+
+        gestor.consultarMascotas(campos, condicionCampo, condicionValor, ordenarPor, orden, limite);
+        
+        scanner.close();
+    }
+}
+
