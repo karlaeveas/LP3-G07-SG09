@@ -1,0 +1,155 @@
+/***********************************************************************************************
+ARCHIVO		: MAIN.JAVA
+AUTOR		: ESPINO VEAS
+FECHA		: 01/11/2024
+DESCRIPCIÓN	: Clase principal que implementa operaciones CRUD (Insertar, Recuperar, Actualizar, Borrar) en una base de datos SQLite usando JDBC. Incluye el manejo de transacciones y el uso de PreparedStatement para interactuar con la base de datos.
+***********************************************************************************************/
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Main {
+
+    private static final String URL = "jdbc:sqlite:mi_base_de_datos.db"; // Cambia el nombre de la base de datos según sea necesario
+
+    public static void main(String[] args) {
+        crearTabla(); // Crea la tabla si no existe
+
+        // Ejemplo de operaciones CRUD
+        insertarRegistro("Juan", "Pérez", 30);
+        recuperarRegistros();
+        actualizarRegistro(1, "Juan Carlos", "Pérez", 31);
+        recuperarRegistros();
+        borrarRegistro(1);
+        recuperarRegistros();
+    }
+
+    private static Connection connect() {
+        try {
+            return DriverManager.getConnection(URL);
+        } catch (SQLException e) {
+            System.out.println("Error de conexión: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static void crearTabla() {
+        String sql = "CREATE TABLE IF NOT EXISTS persona (" +
+                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                     "nombre TEXT NOT NULL," +
+                     "apellido TEXT NOT NULL," +
+                     "edad INTEGER NOT NULL);";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // Insertar registro
+    private static void insertarRegistro(String nombre, String apellido, int edad) {
+        String sql = "INSERT INTO persona (nombre, apellido, edad) VALUES (?, ?, ?)";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            // Iniciar transacción
+            conn.setAutoCommit(false);
+            pstmt.setString(1, nombre);
+            pstmt.setString(2, apellido);
+            pstmt.setInt(3, edad);
+            pstmt.executeUpdate();
+            // Confirmar transacción
+            conn.commit();
+            System.out.println("Registro insertado correctamente.");
+        } catch (SQLException e) {
+            System.out.println("Error al insertar: " + e.getMessage());
+            // Revertir transacción en caso de error
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error al revertir: " + ex.getMessage());
+            }
+        }
+    }
+
+    // Recuperar registros
+    private static void recuperarRegistros() {
+        String sql = "SELECT * FROM persona";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            System.out.println("Registros en la tabla:");
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("id") +
+                                   ", Nombre: " + rs.getString("nombre") +
+                                   ", Apellido: " + rs.getString("apellido") +
+                                   ", Edad: " + rs.getInt("edad"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al recuperar: " + e.getMessage());
+        }
+    }
+
+    // Actualizar registro
+    private static void actualizarRegistro(int id, String nombre, String apellido, int edad) {
+        String sql = "UPDATE persona SET nombre = ?, apellido = ?, edad = ? WHERE id = ?";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            // Iniciar transacción
+            conn.setAutoCommit(false);
+            pstmt.setString(1, nombre);
+            pstmt.setString(2, apellido);
+            pstmt.setInt(3, edad);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+            // Confirmar transacción
+            conn.commit();
+            System.out.println("Registro actualizado correctamente.");
+        } catch (SQLException e) {
+            System.out.println("Error al actualizar: " + e.getMessage());
+            // Revertir transacción en caso de error
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error al revertir: " + ex.getMessage());
+            }
+        }
+    }
+
+    // Borrar registro
+    private static void borrarRegistro(int id) {
+        String sql = "DELETE FROM persona WHERE id = ?";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            // Iniciar transacción
+            conn.setAutoCommit(false);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            // Confirmar transacción
+            conn.commit();
+            System.out.println("Registro borrado correctamente.");
+        } catch (SQLException e) {
+            System.out.println("Error al borrar: " + e.getMessage());
+            // Revertir transacción en caso de error
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error al revertir: " + ex.getMessage());
+            }
+        }
+    }
+}
