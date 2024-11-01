@@ -1,0 +1,220 @@
+/********************************************************************************************
+ARCHIVO	: Main.java
+AUTOR		: ESPINO VEAS
+FECHA		: 01/11/2024
+DESCRIPCIÓN	: Clase principal que implementa operaciones CRUD (Insertar, Recuperar, Actualizar, Borrar) 
+                en una base de datos SQLite usando JDBC. Incluye el manejo de transacciones y el uso 
+                de PreparedStatement para interactuar con la base de datos.
+********************************************************************************************/
+import java.sql.*;
+import java.util.Scanner;
+
+public class Main {
+
+    private static final String URL = "jdbc:sqlite:veterinaria.db"; // Nombre de la base de datos
+    private static final String CLAVE_CONFIRMACION = "1234"; // Clave para confirmar las operaciones
+
+    public static void main(String[] args) {
+        crearTabla(); // Crea la tabla si no existe
+        mostrarMenu();
+    }
+
+    private static Connection connect() {
+        try {
+            return DriverManager.getConnection(URL);
+        } catch (SQLException e) {
+            System.out.println("Error de conexión: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static void crearTabla() {
+        String sql = "CREATE TABLE IF NOT EXISTS mascota (" +
+                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                     "nombre TEXT NOT NULL," +
+                     "tipo TEXT NOT NULL," +
+                     "edad INTEGER NOT NULL," +
+                     "duenio TEXT NOT NULL);"; // Cuatro campos: id, nombre, tipo, edad, dueño
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void mostrarMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int opcion;
+
+        do {
+            System.out.println("Menu:");
+            System.out.println("1. Ingresar mascota");
+            System.out.println("2. Actualizar mascota");
+            System.out.println("3. Borrar mascota");
+            System.out.println("4. Mostrar mascotas");
+            System.out.println("0. Salir");
+            System.out.print("Seleccione una opción: ");
+            opcion = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el buffer
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Ingrese nombre de la mascota: ");
+                    String nombre = scanner.nextLine();
+                    System.out.print("Ingrese tipo de mascota (perro, gato, etc.): ");
+                    String tipo = scanner.nextLine();
+                    System.out.print("Ingrese edad de la mascota: ");
+                    int edad = scanner.nextInt();
+                    scanner.nextLine(); // Limpiar el buffer
+                    System.out.print("Ingrese nombre del dueño: ");
+                    String duenio = scanner.nextLine();
+                    insertarMascota(nombre, tipo, edad, duenio);
+                    break;
+                case 2:
+                    System.out.print("Ingrese ID de la mascota a actualizar: ");
+                    int idActualizar = scanner.nextInt();
+                    scanner.nextLine(); // Limpiar el buffer
+                    System.out.print("Ingrese nuevo nombre de la mascota: ");
+                    String nuevoNombre = scanner.nextLine();
+                    System.out.print("Ingrese nuevo tipo de mascota: ");
+                    String nuevoTipo = scanner.nextLine();
+                    System.out.print("Ingrese nueva edad de la mascota: ");
+                    int nuevaEdad = scanner.nextInt();
+                    scanner.nextLine(); // Limpiar el buffer
+                    System.out.print("Ingrese nuevo nombre del dueño: ");
+                    String nuevoDuenio = scanner.nextLine();
+                    actualizarMascota(idActualizar, nuevoNombre, nuevoTipo, nuevaEdad, nuevoDuenio);
+                    break;
+                case 3:
+                    System.out.print("Ingrese ID de la mascota a borrar: ");
+                    int idBorrar = scanner.nextInt();
+                    borrarMascota(idBorrar);
+                    break;
+                case 4:
+                    mostrarMascotas();
+                    break;
+                case 0:
+                    System.out.println("Saliendo del programa...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente de nuevo.");
+                    break;
+            }
+        } while (opcion != 0);
+
+        scanner.close();
+    }
+
+    // Método para insertar una mascota
+    private static void insertarMascota(String nombre, String tipo, int edad, String duenio) {
+        String sql = "INSERT INTO mascota (nombre, tipo, edad, duenio) VALUES (?, ?, ?, ?)";
+
+        if (confirmarOperacion()) {
+            try (Connection conn = connect(); 
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                conn.setAutoCommit(false);
+                pstmt.setString(1, nombre);
+                pstmt.setString(2, tipo);
+                pstmt.setInt(3, edad);
+                pstmt.setString(4, duenio);
+                pstmt.executeUpdate();
+                conn.commit();
+                System.out.println("Mascota ingresada correctamente.");
+            } catch (SQLException e) {
+                System.out.println("Error al insertar: " + e.getMessage());
+                revertirTransaccion();
+            }
+        } else {
+            System.out.println("Operación cancelada.");
+        }
+    }
+
+    // Método para actualizar una mascota
+    private static void actualizarMascota(int id, String nombre, String tipo, int edad, String duenio) {
+        String sql = "UPDATE mascota SET nombre = ?, tipo = ?, edad = ?, duenio = ? WHERE id = ?";
+
+        if (confirmarOperacion()) {
+            try (Connection conn = connect(); 
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                conn.setAutoCommit(false);
+                pstmt.setString(1, nombre);
+                pstmt.setString(2, tipo);
+                pstmt.setInt(3, edad);
+                pstmt.setString(4, duenio);
+                pstmt.setInt(5, id);
+                pstmt.executeUpdate();
+                conn.commit();
+                System.out.println("Mascota actualizada correctamente.");
+            } catch (SQLException e) {
+                System.out.println("Error al actualizar: " + e.getMessage());
+                revertirTransaccion();
+            }
+        } else {
+            System.out.println("Operación cancelada.");
+        }
+    }
+
+    // Método para borrar una mascota
+    private static void borrarMascota(int id) {
+        String sql = "DELETE FROM mascota WHERE id = ?";
+
+        if (confirmarOperacion()) {
+            try (Connection conn = connect(); 
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                conn.setAutoCommit(false);
+                pstmt.setInt(1, id);
+                pstmt.executeUpdate();
+                conn.commit();
+                System.out.println("Mascota borrada correctamente.");
+            } catch (SQLException e) {
+                System.out.println("Error al borrar: " + e.getMessage());
+                revertirTransaccion();
+            }
+        } else {
+            System.out.println("Operación cancelada.");
+        }
+    }
+
+    // Método para mostrar mascotas
+    private static void mostrarMascotas() {
+        String sql = "SELECT * FROM mascota";
+
+        try (Connection conn = connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            System.out.println("Mascotas en la base de datos:");
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("id") +
+                                   ", Nombre: " + rs.getString("nombre") +
+                                   ", Tipo: " + rs.getString("tipo") +
+                                   ", Edad: " + rs.getInt("edad") +
+                                   ", Dueño: " + rs.getString("duenio"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al recuperar: " + e.getMessage());
+        }
+    }
+
+    // Método para confirmar la operación
+    private static boolean confirmarOperacion() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese la clave de confirmación: ");
+        String clave = scanner.nextLine();
+        return CLAVE_CONFIRMACION.equals(clave);
+    }
+
+    // Método para revertir la transacción
+    private static void revertirTransaccion() {
+        try (Connection conn = connect()) {
+            if (conn != null) {
+                conn.rollback();
+                System.out.println("Transacción revertida.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al revertir: " + e.getMessage());
+        }
+    }
+}
